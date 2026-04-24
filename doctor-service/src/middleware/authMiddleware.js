@@ -9,20 +9,19 @@ const authMiddleware = (allowedRoles = []) => (req, res, next) => {
 
   const token = authHeader.split(" ")[1];
   const candidateSecrets = [
-    process.env.JWT_SECRET,
-    process.env.JWT_SECRET_DOCTOR,
-    process.env.JWT_SECRET_ADMIN
-  ].filter(Boolean);
+    { secret: process.env.JWT_SECRET_DOCTOR, role: "DOCTOR" },
+    { secret: process.env.JWT_SECRET_ADMIN, role: "ADMIN" }
+  ].filter((item) => item.secret);
 
-  for (const secret of candidateSecrets) {
+  for (const candidate of candidateSecrets) {
     try {
-      const decoded = jwt.verify(token, secret);
+      const decoded = jwt.verify(token, candidate.secret);
+      req.user = decoded;
 
       if (allowedRoles.length && !allowedRoles.includes(decoded.role)) {
         return res.status(403).json({ message: "You are not authorized to access this resource" });
       }
 
-      req.user = decoded;
       return next();
     } catch (error) {
       continue;

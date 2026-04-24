@@ -4,7 +4,7 @@ import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const Layout = ({ children }) => {
-  const { isAuthenticated, logout, patient } = useAuth();
+  const { isAuthenticated, logout, user, role } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -33,12 +33,12 @@ const Layout = ({ children }) => {
             <Button color="inherit" component={RouterLink} to="/" disabled={location.pathname === "/"}>
               Home
             </Button>
-            {isAuthenticated && (
+            {isAuthenticated && role === "PATIENT" && (
               <Button color="inherit" component={RouterLink} to="/doctors" disabled={location.pathname === "/doctors"}>
                 Doctors
               </Button>
             )}
-            {isAuthenticated && (
+            {isAuthenticated && role === "PATIENT" && (
               <Button
                 color="inherit"
                 component={RouterLink}
@@ -48,14 +48,32 @@ const Layout = ({ children }) => {
                 Appointments
               </Button>
             )}
-            {!isAuthenticated ? (
-              <Button variant="contained" color="secondary" component={RouterLink} to="/auth">
-                Login / Register
+            {isAuthenticated && role === "DOCTOR" && (
+              <Button color="inherit" component={RouterLink} to="/doctor/dashboard" disabled={location.pathname === "/doctor/dashboard"}>
+                Doctor Dashboard
               </Button>
+            )}
+            {isAuthenticated && role === "ADMIN" && (
+              <Button color="inherit" component={RouterLink} to="/admin/dashboard" disabled={location.pathname === "/admin/dashboard"}>
+                Admin Dashboard
+              </Button>
+            )}
+            {!isAuthenticated ? (
+              <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                <Button variant="contained" color="secondary" component={RouterLink} to="/auth">
+                  Patient Access
+                </Button>
+                <Button variant="outlined" color="inherit" component={RouterLink} to="/doctor/login">
+                  Doctor Login
+                </Button>
+                <Button variant="outlined" color="inherit" component={RouterLink} to="/admin/login">
+                  Admin Login
+                </Button>
+              </Stack>
             ) : (
               <>
                 <Typography variant="body2" sx={{ opacity: 0.92 }}>
-                  {patient?.name}
+                  {user?.name || user?.email}
                 </Typography>
                 <Button variant="contained" color="secondary" onClick={handleLogout}>
                   Logout

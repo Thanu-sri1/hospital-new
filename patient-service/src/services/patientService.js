@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const Patient = require("../models/Patient");
 
 const generateToken = (patientId) =>
-  jwt.sign({ patientId }, process.env.JWT_SECRET, { expiresIn: "7d" });
+  jwt.sign({ patientId, role: "PATIENT" }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
 const sanitizePatient = (patient) => ({
   id: patient._id,

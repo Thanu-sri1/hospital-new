@@ -13,9 +13,12 @@ const availableSlotSchema = new mongoose.Schema(
     endTime: {
       type: String,
       required: true
+    },
+    isBooked: {
+      type: Boolean,
+      default: false
     }
-  },
-  { _id: false }
+  }
 );
 
 const doctorSchema = new mongoose.Schema(
@@ -29,6 +32,21 @@ const doctorSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true
+    },
+    email: {
+      type: String,
+      sparse: true,
+      unique: true,
+      lowercase: true,
+      trim: true
+    },
+    password: {
+      type: String
+    },
+    role: {
+      type: String,
+      enum: ["DOCTOR"],
+      default: "DOCTOR"
     },
     experience: {
       type: Number,

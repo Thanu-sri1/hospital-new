@@ -15,6 +15,10 @@ const appointmentApi = {
     const { data } = await appointmentHttp.get("/appointments/patient", withAuth(token));
     return data;
   },
+  getMyDoctorAppointments: async (token) => {
+    const { data } = await appointmentHttp.get("/appointments/doctor/me", withAuth(token));
+    return data;
+  },
   cancelAppointment: async (token, appointmentId) => {
     const { data } = await appointmentHttp.delete(`/appointments/${appointmentId}`, withAuth(token));
     return data;

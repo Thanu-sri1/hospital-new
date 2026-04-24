@@ -25,6 +25,7 @@ const DoctorsPage = () => {
   const [specialization, setSpecialization] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [selectedAvailability, setSelectedAvailability] = useState(null);
   const [bookingState, setBookingState] = useState({
     open: false,
     doctor: null,
@@ -79,6 +80,18 @@ const DoctorsPage = () => {
     });
   };
 
+  const showAvailability = async (doctor) => {
+    try {
+      const data = await doctorApi.getDoctorAvailability(doctor._id);
+      setSelectedAvailability({
+        doctor: data.doctor,
+        availableSlots: data.availableSlots
+      });
+    } catch (apiError) {
+      setError(apiError.response?.data?.message || "Unable to load doctor availability.");
+    }
+  };
+
   const handleBookAppointment = async () => {
     if (!bookingState.doctor || !bookingState.appointmentDate || !bookingState.timeSlot) {
       setBookingMessage({ type: "error", text: "Select a date and time slot." });
@@ -94,6 +107,7 @@ const DoctorsPage = () => {
         timeSlot: bookingState.timeSlot
       });
       setBookingMessage({ type: "success", text: "Appointment booked successfully." });
+      await loadDoctors();
       setTimeout(closeBooking, 900);
     } catch (apiError) {
       setBookingMessage({
@@ -153,9 +167,14 @@ const DoctorsPage = () => {
                     />
                   ))}
                 </Stack>
-                <Button variant="contained" onClick={() => openBooking(doctor)} disabled={loading}>
+                <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
+                  <Button variant="outlined" onClick={() => showAvailability(doctor)}>
+                    View Availability
+                  </Button>
+                  <Button variant="contained" onClick={() => openBooking(doctor)} disabled={loading || !doctor.availableSlots.length}>
                   Book Appointment
-                </Button>
+                  </Button>
+                </Stack>
               </Stack>
             </SectionCard>
           </Grid>
@@ -215,6 +234,34 @@ const DoctorsPage = () => {
           <Button variant="contained" onClick={handleBookAppointment} disabled={bookingLoading}>
             {bookingLoading ? "Booking..." : "Confirm Booking"}
           </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={Boolean(selectedAvailability)}
+        onClose={() => setSelectedAvailability(null)}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>{selectedAvailability?.doctor?.name} Availability</DialogTitle>
+        <DialogContent sx={{ pt: 2 }}>
+          <Stack spacing={1.5}>
+            {selectedAvailability?.availableSlots?.length ? (
+              selectedAvailability.availableSlots.map((slot) => (
+                <Chip
+                  key={slot._id}
+                  label={`${dayjs(slot.date).format("DD MMM YYYY")} ${slot.startTime}-${slot.endTime}`}
+                  variant="outlined"
+                  sx={{ justifyContent: "flex-start" }}
+                />
+              ))
+            ) : (
+              <Typography color="text.secondary">No currently available slots.</Typography>
+            )}
+          </Stack>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 3 }}>
+          <Button onClick={() => setSelectedAvailability(null)}>Close</Button>
         </DialogActions>
       </Dialog>
     </Stack>

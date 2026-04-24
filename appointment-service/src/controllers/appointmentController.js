@@ -41,9 +41,19 @@ const getDoctorAppointments = async (req, res, next) => {
   }
 };
 
+const getMyDoctorAppointments = async (req, res, next) => {
+  try {
+    const appointments = await appointmentService.getAppointments({ doctorId: req.user.doctorId });
+    res.json(appointments);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   bookAppointment,
   cancelAppointment,
   getPatientAppointments,
-  getDoctorAppointments
+  getDoctorAppointments,
+  getMyDoctorAppointments
 };

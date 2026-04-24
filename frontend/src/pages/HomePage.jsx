@@ -49,6 +49,11 @@ const HomePage = () => {
                 <Button size="large" variant="outlined" component={RouterLink} to={isAuthenticated ? "/appointments" : "/auth"}>
                   View Appointments
                 </Button>
+                {!isAuthenticated ? (
+                  <Button size="large" variant="text" component={RouterLink} to="/doctor/login">
+                    Doctor Portal
+                  </Button>
+                ) : null}
               </Stack>
             </Stack>
           </Grid>

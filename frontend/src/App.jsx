@@ -5,16 +5,22 @@ import HomePage from "./pages/HomePage";
 import AuthPage from "./pages/AuthPage";
 import DoctorsPage from "./pages/DoctorsPage";
 import AppointmentsPage from "./pages/AppointmentsPage";
+import DoctorLoginPage from "./pages/DoctorLoginPage";
+import AdminLoginPage from "./pages/AdminLoginPage";
+import DoctorDashboardPage from "./pages/DoctorDashboardPage";
+import AdminDashboardPage from "./pages/AdminDashboardPage";
 
 const App = () => (
   <Layout>
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/auth" element={<AuthPage />} />
+      <Route path="/doctor/login" element={<DoctorLoginPage />} />
+      <Route path="/admin/login" element={<AdminLoginPage />} />
       <Route
         path="/doctors"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute roles={["PATIENT"]}>
             <DoctorsPage />
           </ProtectedRoute>
         }
@@ -22,8 +28,24 @@ const App = () => (
       <Route
         path="/appointments"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute roles={["PATIENT"]}>
             <AppointmentsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/doctor/dashboard"
+        element={
+          <ProtectedRoute roles={["DOCTOR"]}>
+            <DoctorDashboardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/dashboard"
+        element={
+          <ProtectedRoute roles={["ADMIN"]}>
+            <AdminDashboardPage />
           </ProtectedRoute>
         }
       />

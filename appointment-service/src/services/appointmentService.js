@@ -22,6 +22,15 @@ const sendNotificationSafely = async (payload) => {
   }
 };
 
+const updateDoctorSlotBooking = async ({ doctorId, appointmentDate, timeSlot, isBooked }) => {
+  await doctorClient.post("/doctors/internal/availability/book-status", {
+    doctorId,
+    date: appointmentDate,
+    timeSlot,
+    isBooked
+  });
+};
+
 const validatePatientAndDoctor = async ({ patientId, doctorId, appointmentDate, timeSlot }) => {
   const [patientResponse, availabilityResponse] = await Promise.all([
     patientClient.get(`/patients/validate/${patientId}`),
@@ -86,6 +95,18 @@ const bookAppointment = async ({ patientId, doctorId, appointmentDate, timeSlot 
     status: "BOOKED"
   });
 
+  try {
+    await updateDoctorSlotBooking({
+      doctorId,
+      appointmentDate,
+      timeSlot,
+      isBooked: true
+    });
+  } catch (error) {
+    await Appointment.findByIdAndDelete(appointment._id);
+    throw error;
+  }
+
   await sendNotificationSafely({
     type: "APPOINTMENT_BOOKED",
     recipient: patient.email,
@@ -122,6 +143,19 @@ const cancelAppointment = async (appointmentId, patientId) => {
 
   appointment.status = "CANCELLED";
   await appointment.save();
+
+  try {
+    await updateDoctorSlotBooking({
+      doctorId: appointment.doctorId,
+      appointmentDate: appointment.appointmentDate,
+      timeSlot: appointment.timeSlot,
+      isBooked: false
+    });
+  } catch (error) {
+    appointment.status = "BOOKED";
+    await appointment.save();
+    throw error;
+  }
 
   const enriched = await enrichAppointment(appointment);
 
