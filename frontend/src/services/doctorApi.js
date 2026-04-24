@@ -17,6 +17,10 @@ const doctorApi = {
     const { data } = await doctorHttp.get(`/doctors/${doctorId}/availability`);
     return data;
   },
+  getDoctorSlots: async (doctorId) => {
+    const { data } = await doctorHttp.get(`/doctors/${doctorId}/slots`);
+    return data;
+  },
   registerDoctor: async (payload) => {
     const { data } = await doctorHttp.post("/doctors/register", payload);
     return data;
@@ -33,16 +37,32 @@ const doctorApi = {
     const { data } = await doctorHttp.get("/doctors/me/availability", withAuth(token));
     return data;
   },
+  getMySlots: async (token) => {
+    const { data } = await doctorHttp.get("/doctors/me/slots", withAuth(token));
+    return data;
+  },
   addAvailability: async (token, payload) => {
     const { data } = await doctorHttp.post("/doctors/availability", payload, withAuth(token));
+    return data;
+  },
+  addSlot: async (token, payload) => {
+    const { data } = await doctorHttp.post("/doctors/slots", payload, withAuth(token));
     return data;
   },
   updateAvailability: async (token, slotId, payload) => {
     const { data } = await doctorHttp.put(`/doctors/availability/${slotId}`, payload, withAuth(token));
     return data;
   },
+  updateSlot: async (token, slotId, payload) => {
+    const { data } = await doctorHttp.put(`/doctors/slots/${slotId}`, payload, withAuth(token));
+    return data;
+  },
   deleteAvailability: async (token, slotId) => {
     const { data } = await doctorHttp.delete(`/doctors/availability/${slotId}`, withAuth(token));
+    return data;
+  },
+  deleteSlot: async (token, slotId) => {
+    const { data } = await doctorHttp.delete(`/doctors/slots/${slotId}`, withAuth(token));
     return data;
   },
   getAdminDoctors: async (token) => {

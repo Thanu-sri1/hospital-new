@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Alert, Box, Button, Grid, Stack, TextField, Typography } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import SectionCard from "../components/SectionCard";
 import doctorApi from "../services/doctorApi";
 import { useAuth } from "../context/AuthContext";
@@ -61,6 +61,9 @@ const DoctorLoginPage = () => {
                 />
                 <Button type="submit" variant="contained" disabled={loading}>
                   {loading ? "Signing in..." : "Login"}
+                </Button>
+                <Button component={RouterLink} to="/doctor/register" variant="text">
+                  Need an account? Register as a doctor
                 </Button>
               </Stack>
             </Box>

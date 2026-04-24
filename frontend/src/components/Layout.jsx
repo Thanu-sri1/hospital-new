@@ -66,6 +66,9 @@ const Layout = ({ children }) => {
                 <Button variant="outlined" color="inherit" component={RouterLink} to="/doctor/login">
                   Doctor Login
                 </Button>
+                <Button variant="outlined" color="inherit" component={RouterLink} to="/doctor/register">
+                  Doctor Register
+                </Button>
                 <Button variant="outlined" color="inherit" component={RouterLink} to="/admin/login">
                   Admin Login
                 </Button>

@@ -14,6 +14,7 @@ import {
   Typography
 } from "@mui/material";
 import dayjs from "dayjs";
+import { useNavigate } from "react-router-dom";
 import SectionCard from "../components/SectionCard";
 import doctorApi from "../services/doctorApi";
 import appointmentApi from "../services/appointmentApi";
@@ -21,11 +22,11 @@ import { useAuth } from "../context/AuthContext";
 
 const DoctorsPage = () => {
   const { token } = useAuth();
+  const navigate = useNavigate();
   const [doctors, setDoctors] = useState([]);
   const [specialization, setSpecialization] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [selectedAvailability, setSelectedAvailability] = useState(null);
   const [bookingState, setBookingState] = useState({
     open: false,
     doctor: null,
@@ -78,18 +79,11 @@ const DoctorsPage = () => {
       appointmentDate: "",
       timeSlot: ""
     });
+    setBookingMessage({ type: "", text: "" });
   };
 
-  const showAvailability = async (doctor) => {
-    try {
-      const data = await doctorApi.getDoctorAvailability(doctor._id);
-      setSelectedAvailability({
-        doctor: data.doctor,
-        availableSlots: data.availableSlots
-      });
-    } catch (apiError) {
-      setError(apiError.response?.data?.message || "Unable to load doctor availability.");
-    }
+  const showAvailability = (doctor) => {
+    navigate(`/doctors/${doctor._id}/slots`);
   };
 
   const handleBookAppointment = async () => {
@@ -234,34 +228,6 @@ const DoctorsPage = () => {
           <Button variant="contained" onClick={handleBookAppointment} disabled={bookingLoading}>
             {bookingLoading ? "Booking..." : "Confirm Booking"}
           </Button>
-        </DialogActions>
-      </Dialog>
-
-      <Dialog
-        open={Boolean(selectedAvailability)}
-        onClose={() => setSelectedAvailability(null)}
-        fullWidth
-        maxWidth="sm"
-      >
-        <DialogTitle>{selectedAvailability?.doctor?.name} Availability</DialogTitle>
-        <DialogContent sx={{ pt: 2 }}>
-          <Stack spacing={1.5}>
-            {selectedAvailability?.availableSlots?.length ? (
-              selectedAvailability.availableSlots.map((slot) => (
-                <Chip
-                  key={slot._id}
-                  label={`${dayjs(slot.date).format("DD MMM YYYY")} ${slot.startTime}-${slot.endTime}`}
-                  variant="outlined"
-                  sx={{ justifyContent: "flex-start" }}
-                />
-              ))
-            ) : (
-              <Typography color="text.secondary">No currently available slots.</Typography>
-            )}
-          </Stack>
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 3 }}>
-          <Button onClick={() => setSelectedAvailability(null)}>Close</Button>
         </DialogActions>
       </Dialog>
     </Stack>

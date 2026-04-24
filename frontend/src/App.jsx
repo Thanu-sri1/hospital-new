@@ -6,6 +6,8 @@ import AuthPage from "./pages/AuthPage";
 import DoctorsPage from "./pages/DoctorsPage";
 import AppointmentsPage from "./pages/AppointmentsPage";
 import DoctorLoginPage from "./pages/DoctorLoginPage";
+import DoctorRegistrationPage from "./pages/DoctorRegistrationPage";
+import DoctorSlotsPage from "./pages/DoctorSlotsPage";
 import AdminLoginPage from "./pages/AdminLoginPage";
 import DoctorDashboardPage from "./pages/DoctorDashboardPage";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
@@ -16,12 +18,21 @@ const App = () => (
       <Route path="/" element={<HomePage />} />
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/doctor/login" element={<DoctorLoginPage />} />
+      <Route path="/doctor/register" element={<DoctorRegistrationPage />} />
       <Route path="/admin/login" element={<AdminLoginPage />} />
       <Route
         path="/doctors"
         element={
           <ProtectedRoute roles={["PATIENT"]}>
             <DoctorsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/doctors/:id/slots"
+        element={
+          <ProtectedRoute roles={["PATIENT"]}>
+            <DoctorSlotsPage />
           </ProtectedRoute>
         }
       />
