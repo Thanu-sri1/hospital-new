@@ -1,0 +1,94 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - healthcare-network
+
+  patient-service:
+    build:
+      context: ./patient-service
+    container_name: patient-service
+    restart: unless-stopped
+    env_file:
+      - ./patient-service/.env
+    depends_on:
+      - mongo
+    ports:
+      - "4001:4001"
+    networks:
+      - healthcare-network
+
+  doctor-service:
+    build:
+      context: ./doctor-service
+    container_name: doctor-service
+    restart: unless-stopped
+    env_file:
+      - ./doctor-service/.env
+    depends_on:
+      - mongo
+    ports:
+      - "4002:4002"
+    networks:
+      - healthcare-network
+
+  appointment-service:
+    build:
+      context: ./appointment-service
+    container_name: appointment-service
+    restart: unless-stopped
+    env_file:
+      - ./appointment-service/.env
+    depends_on:
+      - mongo
+      - patient-service
+      - doctor-service
+      - notification-service
+    ports:
+      - "4003:4003"
+    networks:
+      - healthcare-network
+
+  notification-service:
+    build:
+      context: ./notification-service
+    container_name: notification-service
+    restart: unless-stopped
+    env_file:
+      - ./notification-service/.env
+    depends_on:
+      - mongo
+    ports:
+      - "4004:4004"
+    networks:
+      - healthcare-network
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: frontend
+    restart: unless-stopped
+    env_file:
+      - ./frontend/.env
+    depends_on:
+      - patient-service
+      - doctor-service
+      - appointment-service
+      - notification-service
+    ports:
+      - "5173:5173"
+    networks:
+      - healthcare-network
+
+networks:
+  healthcare-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
